@@ -1,7 +1,8 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 
-import { getLinkedInFeed } from "@/lib/radar";
+import { getTopicName } from "@/lib/radar";
+import { searchLinkedInPosts } from "@/lib/googleCustomSearch";
 
 export async function GET(
   req: NextRequest,
@@ -10,16 +11,27 @@ export async function GET(
   const { topic } = await params;
   const url = new URL(req.url);
 
-  const cursorParam = url.searchParams.get("cursor");
   const limitParam = url.searchParams.get("limit");
-  const cursor = cursorParam ? Number(cursorParam) : undefined;
-  const limit = limitParam ? Number(limitParam) : undefined;
+  const limit = limitParam ? Number(limitParam) : 10;
 
-  const { items, nextCursor } = getLinkedInFeed({
+  const topicName = getTopicName(topic) ?? topic;
+  const results = await searchLinkedInPosts(topicName, Math.min(limit, 10));
+
+  // Log all discovered links
+  console.log(
+    `[Google Search] Found ${results.length} links for "${topicName}":`
+  );
+  results.forEach((r, i) => console.log(`  ${i + 1}. ${r.link}`));
+
+  // Map to LinkedInPost-like structure
+  const items = results.map((r, i) => ({
+    id: `google-${i}-${Date.now()}`,
     topic,
-    cursor: Number.isFinite(cursor) ? cursor : undefined,
-    limit: Number.isFinite(limit) ? limit : undefined,
-  });
+    url: r.link,
+    author: { fullName: "LinkedIn" },
+    text: `${r.title}\n\n${r.snippet}`,
+    createdAt: new Date().toISOString(),
+  }));
 
-  return NextResponse.json({ items, nextCursor });
+  return NextResponse.json({ items, nextCursor: null });
 }

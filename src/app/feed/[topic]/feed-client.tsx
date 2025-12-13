@@ -40,7 +40,7 @@ export default function FeedClient({ topic }: { topic: string }) {
     setNextCursor(0);
     try {
       const res = await fetch(
-        `/api/feed/${encodeURIComponent(topic)}?limit=15`,
+        `/api/feed/${encodeURIComponent(topic)}?limit=10`,
         {
           cache: "no-store",
         }
