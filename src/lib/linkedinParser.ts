@@ -46,12 +46,43 @@ export function parseLinkedInPost(html: string): LinkedInPostData {
     "0";
   const comments = parseInt(commentsText, 10) || 0;
 
+  // Main post image - try multiple selectors
+  let imageUrl = "";
+
+  // Try the main feed card media image (most common)
+  const mainImage = $("img.w-main-feed-card-media").first();
+  if (mainImage.length) {
+    imageUrl =
+      mainImage.attr("src") || mainImage.attr("data-delayed-url") || "";
+  }
+
+  // Fallback: try feed-images-content
+  if (!imageUrl) {
+    const feedImage = $('[data-test-id="feed-images-content"] img').first();
+    if (feedImage.length) {
+      imageUrl =
+        feedImage.attr("src") || feedImage.attr("data-delayed-url") || "";
+    }
+  }
+
+  // Fallback: try any lazy-loaded image in the content area
+  if (!imageUrl) {
+    const lazyImage = $(
+      ".main-feed-activity-card img.lazy-load, .main-feed-activity-card img.lazy-loaded"
+    ).first();
+    if (lazyImage.length) {
+      imageUrl =
+        lazyImage.attr("src") || lazyImage.attr("data-delayed-url") || "";
+    }
+  }
+
   return {
     authorName,
     authorAvatar,
     authorProfileUrl,
     content,
     relativeDate,
+    imageUrl,
     likes,
     comments,
   };

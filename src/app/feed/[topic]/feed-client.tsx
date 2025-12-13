@@ -26,7 +26,7 @@ function MetricsRow({ post }: { post: LinkedInPost }) {
 
 export default function FeedClient({ topic }: { topic: string }) {
   const [items, setItems] = useState<LinkedInPost[]>([]);
-  const [nextCursor, setNextCursor] = useState<number | null>(0);
+  const [nextCursor, setNextCursor] = useState<number | null>(1);
   const [loading, setLoading] = useState<boolean>(true);
   const [loadingMore, setLoadingMore] = useState<boolean>(false);
 
@@ -36,7 +36,7 @@ export default function FeedClient({ topic }: { topic: string }) {
   async function loadFirstPage() {
     setLoading(true);
     setItems([]);
-    setNextCursor(0);
+    setNextCursor(1);
     try {
       const res = await fetch(`/api/feed/${encodeURIComponent(topic)}`, {
         cache: "no-store",
@@ -62,7 +62,7 @@ export default function FeedClient({ topic }: { topic: string }) {
     setLoadingMore(true);
     try {
       const res = await fetch(
-        `/api/feed/${encodeURIComponent(topic)}?cursor=${nextCursor}&limit=15`,
+        `/api/feed/${encodeURIComponent(topic)}?start=${nextCursor}`,
         { cache: "no-store" }
       );
       const data = (await res.json()) as {
@@ -191,7 +191,17 @@ export default function FeedClient({ topic }: { topic: string }) {
                 </Button>
               </CardHeader>
 
-              <CardContent className="space-y-2">
+              <CardContent className="space-y-3">
+                {p.imageUrl && (
+                  <div className="relative w-full overflow-hidden rounded-md">
+                    <img
+                      src={p.imageUrl}
+                      alt=""
+                      className="w-full h-auto max-h-[300px] object-cover"
+                      loading="lazy"
+                    />
+                  </div>
+                )}
                 <div className="whitespace-pre-wrap text-sm text-foreground/90 overflow-hidden [display:-webkit-box] [-webkit-line-clamp:5] [-webkit-box-orient:vertical]">
                   {p.text}
                 </div>

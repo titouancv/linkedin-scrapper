@@ -5,6 +5,7 @@
 export type Subject = {
   slug: string;
   name: string;
+  field: string;
   postCount: number;
   popularityScore: number;
 };
@@ -19,6 +20,7 @@ export type LinkedInPost = {
   };
   text: string;
   relativeDate: string;
+  imageUrl?: string;
   metrics?: {
     likes?: number;
     comments?: number;
@@ -35,6 +37,7 @@ export type LinkedInPostData = {
   authorProfileUrl: string;
   content: string;
   relativeDate: string;
+  imageUrl: string;
   likes: number;
   comments: number;
 };
@@ -62,6 +65,7 @@ export type SearchResult = {
   authorProfileUrl: string;
   content: string;
   relativeDate: string;
+  imageUrl: string;
   likes: number;
   comments: number;
 };

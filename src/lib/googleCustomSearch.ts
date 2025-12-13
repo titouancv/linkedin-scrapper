@@ -9,25 +9,39 @@ const API_KEY = process.env.GOOGLE_API_KEY!;
 const CX = process.env.GOOGLE_CX!;
 
 export async function searchLinkedInPosts(
-  topic: string
-): Promise<SearchResult[]> {
+  topic: string,
+  start: number = 1
+): Promise<{ results: SearchResult[]; hasMore: boolean }> {
   const query = `site:linkedin.com/posts "${topic}"`;
 
   const url = new URL("https://www.googleapis.com/customsearch/v1");
   url.searchParams.set("key", API_KEY);
   url.searchParams.set("cx", CX);
   url.searchParams.set("q", query);
+  url.searchParams.set("num", "10");
+  url.searchParams.set("start", start.toString());
   url.searchParams.set("sort", "date:r");
 
   const res = await fetch(url.toString());
   const data: GoogleCseResponse = await res.json();
 
-  if (!data.items) return [];
+  if (!data.items) return { results: [], hasMore: false };
 
-  // Fetch and parse HTML for each result
-  const results: SearchResult[] = [];
+  // Fetch all LinkedIn pages in parallel for faster loading
+  const htmlResults = await Promise.all(
+    data.items.map(async (item) => {
+      const link = item.link ?? "";
+      try {
+        const html = await fetchLinkedInPage(link);
+        return { item, html };
+      } catch {
+        return { item, html: null };
+      }
+    })
+  );
 
-  for (const item of data.items) {
+  // Parse all results
+  const results: SearchResult[] = htmlResults.map(({ item, html }) => {
     const snippet = item.snippet ?? "";
     const link = item.link ?? "";
 
@@ -37,20 +51,16 @@ export async function searchLinkedInPosts(
       authorProfileUrl: "",
       content: "",
       relativeDate: "",
+      imageUrl: "",
       likes: 0,
       comments: 0,
     };
 
-    try {
-      const html = await fetchLinkedInPage(link);
-      if (html) {
-        linkedInData = parseLinkedInPost(html);
-      }
-    } catch (error) {
-      console.error(`Failed to fetch/parse ${link}:`, error);
+    if (html) {
+      linkedInData = parseLinkedInPost(html);
     }
 
-    results.push({
+    return {
       title: item.title ?? "",
       link,
       snippet,
@@ -59,12 +69,16 @@ export async function searchLinkedInPosts(
       authorProfileUrl: linkedInData.authorProfileUrl,
       content: truncateText(linkedInData.content || snippet, 500),
       relativeDate: linkedInData.relativeDate,
+      imageUrl: linkedInData.imageUrl,
       likes: linkedInData.likes,
       comments: linkedInData.comments,
-    });
-  }
+    };
+  });
 
-  return results;
+  // Google CSE limits to 100 results (10 pages of 10)
+  const hasMore = start < 91 && results.length === 10;
+
+  return { results, hasMore };
 }
 
 async function fetchLinkedInPage(url: string): Promise<string | null> {
