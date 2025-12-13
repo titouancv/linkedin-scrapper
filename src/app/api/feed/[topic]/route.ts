@@ -9,28 +9,26 @@ export async function GET(
   { params }: { params: Promise<{ topic: string }> }
 ) {
   const { topic } = await params;
-  const url = new URL(req.url);
-
-  const limitParam = url.searchParams.get("limit");
-  const limit = limitParam ? Number(limitParam) : 10;
 
   const topicName = getTopicName(topic) ?? topic;
-  const results = await searchLinkedInPosts(topicName, Math.min(limit, 10));
-
-  // Log all discovered links
-  console.log(
-    `[Google Search] Found ${results.length} links for "${topicName}":`
-  );
-  results.forEach((r, i) => console.log(`  ${i + 1}. ${r.link}`));
+  const results = await searchLinkedInPosts(topicName);
 
   // Map to LinkedInPost-like structure
   const items = results.map((r, i) => ({
     id: `google-${i}-${Date.now()}`,
     topic,
     url: r.link,
-    author: { fullName: "LinkedIn" },
-    text: `${r.title}\n\n${r.snippet}`,
-    createdAt: new Date().toISOString(),
+    author: {
+      fullName: r.authorName,
+      avatarUrl: r.authorAvatar,
+      profileUrl: r.authorProfileUrl,
+    },
+    text: r.content,
+    relativeDate: r.relativeDate,
+    metrics: {
+      likes: r.likes,
+      comments: r.comments,
+    },
   }));
 
   return NextResponse.json({ items, nextCursor: null });

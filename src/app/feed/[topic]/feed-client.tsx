@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useEffect, useMemo, useRef, useState } from "react";
 
 import type { LinkedInPost } from "@/lib/radar";
-import { formatRelative, getInitials, getTopicName } from "@/lib/radar";
+import { getInitials, getTopicName } from "@/lib/radar";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
@@ -17,7 +17,6 @@ function MetricsRow({ post }: { post: LinkedInPost }) {
   const parts: string[] = [];
   if (typeof m.likes === "number") parts.push(`${m.likes} likes`);
   if (typeof m.comments === "number") parts.push(`${m.comments} comments`);
-  if (typeof m.reposts === "number") parts.push(`${m.reposts} reposts`);
   if (parts.length === 0) return null;
 
   return (
@@ -39,12 +38,9 @@ export default function FeedClient({ topic }: { topic: string }) {
     setItems([]);
     setNextCursor(0);
     try {
-      const res = await fetch(
-        `/api/feed/${encodeURIComponent(topic)}?limit=10`,
-        {
-          cache: "no-store",
-        }
-      );
+      const res = await fetch(`/api/feed/${encodeURIComponent(topic)}`, {
+        cache: "no-store",
+      });
       const data = (await res.json()) as {
         items: LinkedInPost[];
         nextCursor: number | null;
@@ -178,7 +174,7 @@ export default function FeedClient({ topic }: { topic: string }) {
                       {p.author.fullName}
                     </div>
                     <div className="text-xs text-muted-foreground">
-                      {formatRelative(p.createdAt)}
+                      {p.relativeDate}
                     </div>
                   </div>
                 </div>
