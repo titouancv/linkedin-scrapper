@@ -1,14 +1,5 @@
 import * as cheerio from "cheerio";
-
-export type LinkedInPostData = {
-  authorName: string;
-  authorAvatar: string;
-  authorProfileUrl: string;
-  content: string;
-  relativeDate: string;
-  likes: number;
-  comments: number;
-};
+import type { LinkedInPostData } from "@/types";
 
 export function parseLinkedInPost(html: string): LinkedInPostData {
   const $ = cheerio.load(html);

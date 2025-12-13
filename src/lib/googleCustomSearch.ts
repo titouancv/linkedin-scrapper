@@ -1,35 +1,12 @@
-import {
-  parseLinkedInPost,
-  truncateText,
-  type LinkedInPostData,
-} from "./linkedinParser";
+import type {
+  GoogleCseResponse,
+  LinkedInPostData,
+  SearchResult,
+} from "@/types";
+import { parseLinkedInPost, truncateText } from "./linkedinParser";
 
 const API_KEY = process.env.GOOGLE_API_KEY!;
 const CX = process.env.GOOGLE_CX!;
-
-type GoogleCseItem = {
-  title?: string;
-  link?: string;
-  snippet?: string;
-};
-
-type GoogleCseResponse = {
-  items?: GoogleCseItem[];
-};
-
-export type SearchResult = {
-  title: string;
-  link: string;
-  snippet: string;
-  // Parsed LinkedIn data
-  authorName: string;
-  authorAvatar: string;
-  authorProfileUrl: string;
-  content: string;
-  relativeDate: string;
-  likes: number;
-  comments: number;
-};
 
 export async function searchLinkedInPosts(
   topic: string

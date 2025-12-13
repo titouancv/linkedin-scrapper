@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useEffect, useMemo, useRef, useState } from "react";
 
-import type { LinkedInPost } from "@/lib/radar";
+import type { LinkedInPost } from "@/types";
 import { getInitials, getTopicName } from "@/lib/radar";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";

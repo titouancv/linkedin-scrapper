@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
-import type { Subject } from "@/lib/radar";
+import type { Subject } from "@/types";
 import { Button } from "@/components/ui/button";
 import {
   Card,

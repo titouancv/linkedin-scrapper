@@ -1,26 +1,6 @@
-export type Subject = {
-  slug: string;
-  name: string;
-  postCount: number;
-  popularityScore: number;
-};
+import type { Subject } from "@/types";
 
-export type LinkedInPost = {
-  id: string;
-  topic: string;
-  url: string;
-  author: {
-    fullName: string;
-    avatarUrl?: string;
-  };
-  text: string;
-  relativeDate: string;
-  metrics?: {
-    likes?: number;
-    comments?: number;
-    reposts?: number;
-  };
-};
+export type { Subject, LinkedInPost } from "@/types";
 
 const TOPICS: Array<{ slug: string; name: string }> = [
   { slug: "ai-act", name: "AI Act" },
