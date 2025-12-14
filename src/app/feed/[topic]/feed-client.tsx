@@ -192,19 +192,19 @@ export default function FeedClient({ topic }: { topic: string }) {
               </CardHeader>
 
               <CardContent className="space-y-3">
+                <div className="whitespace-pre-wrap text-sm text-foreground/90 overflow-hidden [display:-webkit-box] [-webkit-line-clamp:5] [-webkit-box-orient:vertical]">
+                  {p.text}
+                </div>
                 {p.imageUrl && (
                   <div className="relative w-full overflow-hidden rounded-md">
                     <img
                       src={p.imageUrl}
                       alt=""
-                      className="w-full h-auto max-h-[300px] object-cover"
+                      className="w-full h-auto max-h-[200px] object-cover"
                       loading="lazy"
                     />
                   </div>
                 )}
-                <div className="whitespace-pre-wrap text-sm text-foreground/90 overflow-hidden [display:-webkit-box] [-webkit-line-clamp:5] [-webkit-box-orient:vertical]">
-                  {p.text}
-                </div>
                 <MetricsRow post={p} />
               </CardContent>
             </Card>

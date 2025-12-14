@@ -1,7 +1,8 @@
 import { NextResponse } from "next/server";
 
-import { listSubjects } from "@/lib/radar";
+import { listSubjectsWithPopularity } from "@/lib/radar";
 
 export async function GET() {
-  return NextResponse.json({ subjects: listSubjects() });
+  const subjects = await listSubjectsWithPopularity();
+  return NextResponse.json({ subjects });
 }

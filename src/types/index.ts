@@ -6,7 +6,7 @@ export type Subject = {
   slug: string;
   name: string;
   field: string;
-  postCount: number;
+  description: string;
   popularityScore: number;
 };
 

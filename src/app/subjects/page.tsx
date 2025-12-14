@@ -6,39 +6,70 @@ import { useEffect, useMemo, useState } from "react";
 
 import type { Subject } from "@/types";
 import { Button } from "@/components/ui/button";
-import { Card, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 
-const FIELD_ORDER = [
-  "AI & Data",
-  "Digital Markets",
-  "Privacy & Security",
-  "Finance",
-  "Sustainability",
-  "Other",
-];
+type GroupedSubjects = {
+  field: string;
+  subjects: Subject[];
+};
+
+function getScoreColor(score: number): string {
+  if (score >= 80) return "text-green-600";
+  if (score >= 60) return "text-emerald-500";
+  if (score >= 40) return "text-yellow-500";
+  if (score >= 20) return "text-orange-500";
+  return "text-red-500";
+}
+
+function getScoreLabel(score: number): string {
+  if (score >= 80) return "Très populaire";
+  if (score >= 60) return "Populaire";
+  if (score >= 40) return "Modéré";
+  if (score >= 20) return "Faible";
+  return "Très faible";
+}
 
 export default function SubjectsPage() {
   const router = useRouter();
   const [subjects, setSubjects] = useState<Subject[] | null>(null);
 
-  // Group subjects by field
-  const groupedSubjects = useMemo(() => {
-    if (!subjects) return null;
+  // Group subjects by field and sort by popularity (descending)
+  const groupedSubjects = useMemo<GroupedSubjects[]>(() => {
+    if (!subjects) return [];
 
-    const groups: Record<string, Subject[]> = {};
+    const groups = new Map<string, Subject[]>();
+
+    // Group by field
     for (const subject of subjects) {
-      if (!groups[subject.field]) {
-        groups[subject.field] = [];
-      }
-      groups[subject.field].push(subject);
+      const existing = groups.get(subject.field) || [];
+      existing.push(subject);
+      groups.set(subject.field, existing);
     }
 
-    // Sort by FIELD_ORDER
-    return FIELD_ORDER.filter((field) => groups[field]).map((field) => ({
-      field,
-      subjects: groups[field],
-    }));
+    // Convert to array, sort subjects within each group by popularity (descending)
+    const result: GroupedSubjects[] = [];
+    for (const [field, fieldSubjects] of groups) {
+      result.push({
+        field,
+        subjects: fieldSubjects.sort(
+          (a, b) => b.popularityScore - a.popularityScore
+        ),
+      });
+    }
+
+    // Sort groups by max popularity score (descending)
+    return result.sort((a, b) => {
+      const maxA = Math.max(...a.subjects.map((s) => s.popularityScore));
+      const maxB = Math.max(...b.subjects.map((s) => s.popularityScore));
+      return maxB - maxA;
+    });
   }, [subjects]);
 
   useEffect(() => {
@@ -60,7 +91,7 @@ export default function SubjectsPage() {
   }, []);
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-6">
       <div className="space-y-1">
         <h1 className="text-2xl font-semibold">Sujets réglementaires</h1>
         <p className="text-sm text-muted-foreground">
@@ -68,17 +99,21 @@ export default function SubjectsPage() {
         </p>
       </div>
 
-      {!groupedSubjects ? (
-        <div className="space-y-6">
-          {Array.from({ length: 3 }).map((_, i) => (
-            <div key={i} className="space-y-3">
+      {!subjects ? (
+        <div className="space-y-8">
+          {Array.from({ length: 2 }).map((_, groupIndex) => (
+            <div key={groupIndex} className="space-y-4">
               <Skeleton className="h-6 w-40" />
               <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-                {Array.from({ length: 3 }).map((_, j) => (
-                  <Card key={j}>
+                {Array.from({ length: 3 }).map((_, i) => (
+                  <Card key={i}>
                     <CardHeader>
                       <Skeleton className="h-5 w-32" />
                     </CardHeader>
+                    <CardContent className="space-y-2">
+                      <Skeleton className="h-4 w-40" />
+                      <Skeleton className="h-4 w-44" />
+                    </CardContent>
                     <CardFooter>
                       <Skeleton className="h-9 w-28" />
                     </CardFooter>
@@ -90,13 +125,13 @@ export default function SubjectsPage() {
         </div>
       ) : (
         <div className="space-y-8">
-          {groupedSubjects.map(({ field, subjects: fieldSubjects }) => (
-            <section key={field} className="space-y-3">
-              <h2 className="text-lg font-medium text-foreground/80 border-b pb-2">
-                {field}
+          {groupedSubjects.map((group) => (
+            <div key={group.field} className="space-y-4">
+              <h2 className="text-xl font-semibold text-foreground border-b pb-2">
+                {group.field}
               </h2>
               <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-                {fieldSubjects.map((s) => (
+                {group.subjects.map((s) => (
                   <Card
                     key={s.slug}
                     role="button"
@@ -111,6 +146,30 @@ export default function SubjectsPage() {
                     <CardHeader>
                       <CardTitle>{s.name}</CardTitle>
                     </CardHeader>
+                    <CardContent className="space-y-1 text-sm">
+                      <div className="text-muted-foreground">
+                        {s.description}
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <span className="text-muted-foreground">
+                          Popularité :
+                        </span>
+                        <span
+                          className={`font-bold ${getScoreColor(
+                            s.popularityScore
+                          )}`}
+                        >
+                          {s.popularityScore}
+                        </span>
+                        <span
+                          className={`text-xs ${getScoreColor(
+                            s.popularityScore
+                          )}`}
+                        >
+                          ({getScoreLabel(s.popularityScore)})
+                        </span>
+                      </div>
+                    </CardContent>
                     <CardFooter>
                       <Button asChild size="sm">
                         <Link href={`/feed/${s.slug}`}>Voir le feed</Link>
@@ -119,7 +178,7 @@ export default function SubjectsPage() {
                   </Card>
                 ))}
               </div>
-            </section>
+            </div>
           ))}
         </div>
       )}

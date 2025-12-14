@@ -100,7 +100,7 @@ export function truncateText(text: string, maxLength: number = 280): string {
 
 export function formatRelativeDate(relativeDate: string): string {
   // Convert LinkedIn format (3mo, 2d, 5h) to readable format
-  const match = relativeDate.match(/^(\d+)(y|mo|w|d|h|m|s)$/);
+  const match = relativeDate.match(/^(\d+)(y|mo|w|d|h|m|s)(?:\s+.*)?$/);
 
   if (!match) return relativeDate;
 

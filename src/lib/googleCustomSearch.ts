@@ -20,7 +20,6 @@ export async function searchLinkedInPosts(
   url.searchParams.set("q", query);
   url.searchParams.set("num", "10");
   url.searchParams.set("start", start.toString());
-  url.searchParams.set("sort", "date:r");
 
   const res = await fetch(url.toString());
   const data: GoogleCseResponse = await res.json();
