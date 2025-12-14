@@ -3,7 +3,7 @@ const googleTrends = require("google-trends-api");
 
 export type TrendResult = {
   keyword: string;
-  score: number; // 0-100 normalized score
+  score: number;
 };
 
 type TimelineDataPoint = {

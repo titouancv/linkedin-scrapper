@@ -91,7 +91,6 @@ export function parseLinkedInPost(html: string): LinkedInPostData {
 export function truncateText(text: string, maxLength: number = 280): string {
   if (text.length <= maxLength) return text;
 
-  // Find the last space before maxLength to avoid cutting words
   const lastSpace = text.lastIndexOf(" ", maxLength);
   const cutoff = lastSpace > 0 ? lastSpace : maxLength;
 

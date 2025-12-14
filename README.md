@@ -133,12 +133,12 @@ L'application sera accessible sur [http://localhost:3000](http://localhost:3000)
 
 **🔧 Solutions d'amélioration** :
 
-| Solution                                                              | Complexité | Coût      |
-| --------------------------------------------------------------------- | ---------- | --------- |
-| **SerpApi** (Google Trends proxy)                                     | Faible     | ~$50/mois |
-| **Proxy rotatif** (Bright Data, etc.)                                 | Moyenne    | ~$15/mois |
-| **Google Trends API officiel** (version alpha, accesible sur demande) | Faible     | Gratuit   |
-| **Cache Redis persistant**                                            | Moyenne    | ~$5/mois  |
+| Solution                                                               | Complexité | Coût      |
+| ---------------------------------------------------------------------- | ---------- | --------- |
+| **SerpApi** (Google Trends proxy)                                      | Faible     | ~$50/mois |
+| **Proxy rotatif** (Bright Data, etc.)                                  | Moyenne    | ~$15/mois |
+| **Google Trends API officiel** (version alpha, accessible sur demande) | Faible     | Gratuit   |
+| **Cache Redis persistant**                                             | Moyenne    | ~$5/mois  |
 
 ---
 

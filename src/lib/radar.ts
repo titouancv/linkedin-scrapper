@@ -87,17 +87,11 @@ function initials(fullName: string) {
     .join("");
 }
 
-/**
- * Fetch popularity scores from Google Trends for all topics
- */
 async function fetchPopularityScores(): Promise<Map<string, number>> {
   const keywords = TOPICS.map((t) => t.name);
   return await compareKeywordsPopularity(keywords);
 }
 
-/**
- * Get cached popularity scores, refreshing if needed
- */
 async function getPopularityScores(): Promise<Map<string, number>> {
   const now = Date.now();
 
@@ -111,14 +105,10 @@ async function getPopularityScores(): Promise<Map<string, number>> {
     return popularityCache;
   } catch (error) {
     console.error("Failed to fetch popularity scores:", error);
-    // Return empty map if fetch fails, keeping old cache if available
     return popularityCache || new Map();
   }
 }
 
-/**
- * List all subjects with popularity scores from Google Trends
- */
 export async function listSubjectsWithPopularity(): Promise<Subject[]> {
   const scores = await getPopularityScores();
 
